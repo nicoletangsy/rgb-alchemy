@@ -8,6 +8,25 @@ const getRandomInt = (min, max) => {
   return Math.floor(min + Math.random() * (max + 1 - min));
 };
 
+const calcDelta = (target) => {
+  const distance = Math.sqrt(
+    target[0] ** 2 +
+    target[1] ** 2 +
+    target[2] ** 2
+  );
+  const delta = (distance / Math.sqrt(3) / 255) * 100;
+  return delta;
+};
+
+//generate random target color until delta is greater than or equal 10
+const getTarget = () => {
+  let target = [getRandomInt(0, 255), getRandomInt(0, 255), getRandomInt(0, 255)];
+  while (calcDelta(target) < 10) {
+    target = [getRandomInt(0, 255), getRandomInt(0, 255), getRandomInt(0, 255)];
+  }
+  return target;
+};
+
 const getGameInfo = (userId) => {
   if (!userId) {
     userId = Math.random().toString(16).slice(2, 8);
@@ -18,7 +37,7 @@ const getGameInfo = (userId) => {
     width: getRandomInt(10, 20),
     height: getRandomInt(4, 10),
     maxMoves: getRandomInt(8, 20),
-    target: [getRandomInt(0, 255), getRandomInt(0, 255), getRandomInt(0, 255)],
+    target: getTarget(), // [r, g, b]
   };
 };
 
