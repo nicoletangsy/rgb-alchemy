@@ -45,3 +45,6 @@ export const gameDataSchema = z.object({
 });
 
 export type GameDataType = z.infer<typeof gameDataSchema>;
+
+//router
+export type PageType = 'home' | 'game' | 'instruction';

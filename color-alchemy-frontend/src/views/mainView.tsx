@@ -1,74 +1,29 @@
-import React, { useState, useContext, useCallback, useEffect } from "react";
-import Tile from "../components/tile";
-import SDialog from "../components/SDialog";
-import styled from "styled-components";
-import { Context } from "contexts/context";
-import GameGrid from "./gameGridView";
+import React, { useCallback, useState } from "react";
+import HomeView from "./homeView";
+import GameView from "./gameView";
+import InstructionView from "./instructionView";
+import { PageType } from "types";
 
-const SDiv = styled.div`
-  margin: 12px;
-`;
+const MainView: React.FC = () => {
+  const [page, setPage] = useState<PageType>("home"); //TODO: use react-router
 
-const SRow = styled.div`
-  display: flex;
-  margin: 12px 0;
+  const onClickStartGame = useCallback(() => {
+    setPage("game");
+  }, []);
 
-  > span {
-    margin: 0 12px;
-  }
-`;
+  const onClickInstruction = useCallback(() => {
+    setPage("instruction");
+  }, []);
 
-const GameView: React.FC = () => {
-  const { userData, gameData, fetchNewGame, loading } = useContext(Context);
-  const { closest, delta } = gameData;
-  const [open, setOpen] = useState(false);
-  const movesLeft = userData.maxMoves - gameData.moved;
-  const isWin = delta < 10;
-
-  const onCloseDialog = () => {
-    setOpen(false);
-  };
-
-  const onPlayAgain = useCallback(() => {
-    fetchNewGame();
-    setOpen(false);
-  }, [fetchNewGame]);
-
-  useEffect(() => {
-    if (movesLeft <= 0 || isWin) {
-      setOpen(true);
-    }
-  }, [movesLeft, isWin, delta]);
-
-  if (loading) {
-    return <SDiv>Loading...</SDiv>;
-  }
-
-  return  (
-    <div>
-      <SDiv>
-        <b>RGB Alchemy</b>
-      </SDiv>
-      <SDiv>User ID: {userData.userId} </SDiv>
-      <SDiv>Moves left: {movesLeft}</SDiv>
-      <SRow>
-        <span>Target Color</span>
-        <Tile color={userData.target} />
-      </SRow>
-      <SRow>
-        <span>Closest Color</span>
-        <Tile color={closest.color} />
-        <span>Δ={delta.toFixed(2)}%</span>
-      </SRow>
-      <GameGrid />
-      <SDialog
-        open={!loading && open}
-        onClose={onCloseDialog}
-        onConfirm={onPlayAgain}
-        isWin={isWin}
-      />
-    </div>
+  return page === "home" ? (
+    <HomeView onClickStartGame={onClickStartGame} onClickInstruction={onClickInstruction}/>
+  ) : page === "instruction" ? (
+    <InstructionView onClickStartGame={onClickStartGame}/>
+  ) : page === "game" ? (
+    <GameView />
+  ) : (
+    <div>Loading...</div>
   );
 };
 
-export default GameView;
+export default MainView;
