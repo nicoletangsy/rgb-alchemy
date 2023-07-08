@@ -38,12 +38,14 @@ const GameGrid: React.FC = () => {
               const draggable = !tile.isSource && moved >= 3;
               const isClosest = closest.x === tile.x && closest.y === tile.y;
               const onClick = () => {
-                const newLastSrc = {
-                  x: tile.x,
-                  y: tile.y,
-                  color: nextPrimaryColor,
-                };
-                setLastSrc(newLastSrc);
+                if (clickable) {
+                  const newLastSrc = {
+                    x: tile.x,
+                    y: tile.y,
+                    color: nextPrimaryColor,
+                  };
+                  setLastSrc(newLastSrc);
+                }
               };
               const onDrag = (e: DragEvent<HTMLDivElement>) => {
                 if (draggable) {
