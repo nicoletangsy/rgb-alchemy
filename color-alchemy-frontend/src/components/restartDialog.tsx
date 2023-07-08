@@ -21,7 +21,6 @@ const SDialog: React.FC<SDialogProps> = ({
     return (
         <Dialog
             open={open}
-            onClose={onClose}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
         >

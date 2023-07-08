@@ -30,10 +30,11 @@ const SText = styled.span<{ $isDanger: boolean }>`
 const GameView: React.FC = () => {
   const { userData, gameData, setGameData, fetchNewGame, loading } =
     useContext(Context);
-  const { closest, delta } = gameData;
+  const { closest, delta, isEndGame } = gameData;
   const [open, setOpen] = useState(false);
   const movesLeft = userData.maxMoves - gameData.moved;
   const isWin = delta < 10;
+  const endGameText = isWin ? "You Win! Congratulations!" : "Game Over! :(";
 
   const onCloseDialog = () => {
     setGameData({ ...gameData, isEndGame: true });
@@ -58,6 +59,13 @@ const GameView: React.FC = () => {
   //TODO: add i18n support
   return (
     <SContainer>
+      {
+        isEndGame && (
+          <SDiv>
+            <b>{endGameText}</b>
+          </SDiv>
+        )
+      }
       <SDiv>
         <b>RGB Alchemy</b>
       </SDiv>
