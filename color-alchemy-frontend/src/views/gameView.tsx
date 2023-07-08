@@ -50,7 +50,7 @@ const GameView: React.FC = () => {
   }
 
   //TODO: add i18n support
-  return  (
+  return (
     <SContainer>
       <SDiv>
         <b>RGB Alchemy</b>

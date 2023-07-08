@@ -169,3 +169,37 @@ export const initTiles = (width: number, height: number) => {
   }
   return tiles;
 };
+
+export const updateGameGrid = (width: number, height: number, srcs: TileType[], tiles: TileType[]) => {
+  const grid: TileType[][] = [];
+  //step 1: push top sources row, add isSource property
+  grid.push(srcs.filter((tile) => tile.x === 0).map((tile) => ({...tile, isSource: true})));
+  //step 2: push middle tile rows with left and right sources
+  for (let i = 1; i <= height; i++) {
+    const row: TileType[] = [];
+    const leftSrc = srcs.find(
+      (tile) => tile.x === i && tile.y === 0
+    );
+    const rightSrc = srcs.find(
+      (tile) => tile.x === i && tile.y === width + 1
+    );
+    if (leftSrc) {
+      //add isSource property and push to row
+      row.push({...leftSrc, isSource: true});
+    }
+    for (let j=1; j<=width; j++) {
+      const tile = tiles.find((tile) => tile.x === i && tile.y === j);
+      if (tile) {
+        row.push(tile);
+      }
+    }
+    if (rightSrc) {
+      //add isSource property and push to row
+      row.push({...rightSrc, isSource: true});
+    }
+    grid.push(row);
+  }
+  //step 3: push bottom sources row
+  grid.push(srcs.filter((tile) => tile.x === height + 1).map((tile) => ({...tile, isSource: true})));
+  return grid;
+};

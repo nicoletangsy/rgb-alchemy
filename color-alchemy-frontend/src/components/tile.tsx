@@ -1,6 +1,6 @@
 import React, { DragEvent } from "react";
 import { ColorType } from "types";
-import styled from "styled-components"; //nictodo: fix styled-components macro
+import styled from "styled-components";
 import Tooltip from "@mui/material/Tooltip";
 
 export interface TileProps {

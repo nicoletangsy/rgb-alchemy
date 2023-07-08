@@ -6,6 +6,7 @@ import {
   initSrcs,
   initTiles,
   findNewColorMultiSrc,
+  updateGameGrid,
 } from "utils";
 import axios from "axios";
 
@@ -23,6 +24,8 @@ export interface IContext {
   draggingTile: TileType | null;
   setDraggingTile: (tile: TileType | null) => void;
   fetchNewGame: () => void;
+  gameGrid: TileType[][];
+  setGameGrid: (grid: TileType[][]) => void;
 }
 
 const initContext: IContext = {
@@ -53,6 +56,7 @@ const initContext: IContext = {
     },
     delta: 100,
     tiles: [],
+    isEndGame: false,
   },
   setGameData: () => {},
   loading: true,
@@ -62,6 +66,8 @@ const initContext: IContext = {
   draggingTile: null,
   setDraggingTile: () => {},
   fetchNewGame: () => {},
+  gameGrid: [],
+  setGameGrid: () => {},
 };
 
 export const Context = createContext<IContext>(initContext);
@@ -77,13 +83,12 @@ const ContextProvider: React.FC<{
   const [draggingTile, setDraggingTile] = useState<TileType | null>(
     initContext.draggingTile
   );
+  const [gameGrid, setGameGrid] = useState<TileType[][]>(initContext.gameGrid);
 
-  const fetchNewGame = async () => {
+  const fetchData = async (url: string) => {
     setLoading(true);
     try {
-      const res = await axios.get(
-        "http://localhost:9876/init/user/" + userData.userId
-      );
+      const res = await axios.get(url);
       const data = await res.data;
       const width = data?.width || 10;
       const height = data?.height || 4;
@@ -101,6 +106,9 @@ const ContextProvider: React.FC<{
           b: 0,
         },
       };
+      const srcs = initSrcs(width, height);
+      const tiles = initTiles(width, height);
+      const gameGrid = updateGameGrid(width, height, srcs, tiles);
       setUserData({
         userId: data?.userId || "",
         width,
@@ -108,67 +116,31 @@ const ContextProvider: React.FC<{
         maxMoves: data?.maxMoves || 8,
         target,
       });
-      setColorSources(initSrcs(width, height));
+      setColorSources(srcs);
       setGameData({
         moved: 0,
         closest,
         delta: calcDelta(target, closest.color),
-        tiles: initTiles(width, height),
+        tiles,
+        isEndGame: false,
       });
       setLastSrc(null);
       setDraggingTile(null);
+      setGameGrid(gameGrid);
       setLoading(false);
     } catch (err) {
       console.log(err);
     }
   };
 
+  const fetchNewGame = () => {
+    const url = "http://localhost:9876/init/user/" + userData.userId;
+    fetchData(url);
+  };
+
   useEffect(() => {
     // fetch init data
-    setLoading(true);
-    const fetchInit = async () => {
-      try {
-        const res = await axios.get("http://localhost:9876/init");
-        const data = await res.data;
-        const width = data?.width || 10;
-        const height = data?.height || 4;
-        const target = {
-          r: data?.target[0] || 0,
-          g: data?.target[1] || 0,
-          b: data?.target[2] || 0,
-        };
-        const closest = {
-          x: 0,
-          y: 0,
-          color: {
-            r: 0,
-            g: 0,
-            b: 0,
-          },
-        };
-        setUserData({
-          userId: data?.userId || "",
-          width,
-          height,
-          maxMoves: data?.maxMoves || 8,
-          target,
-        });
-        setColorSources(initSrcs(width, height));
-        setGameData({
-          moved: 0,
-          closest,
-          delta: calcDelta(target, closest.color),
-          tiles: initTiles(width, height),
-        });
-        setLastSrc(null);
-        setDraggingTile(null);
-        setLoading(false);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    fetchInit();
+    fetchData("http://localhost:9876/init");
   }, []);
 
   useEffect(() => {
@@ -208,7 +180,14 @@ const ContextProvider: React.FC<{
           delta = newDelta;
         }
       }
-      
+      // step 3: update game grid
+      const newGameGrid = updateGameGrid(
+        userData.width,
+        userData.height,
+        newColorSources,
+        newTiles
+      );
+
       setColorSources(newColorSources);
       setGameData({
         ...gameData,
@@ -218,6 +197,7 @@ const ContextProvider: React.FC<{
         moved: gameData.moved + 1,
       });
       setLastSrc(null);
+      setGameGrid(newGameGrid);
     }
   }, [
     colorSources,
@@ -244,6 +224,8 @@ const ContextProvider: React.FC<{
         draggingTile,
         setDraggingTile,
         fetchNewGame,
+        gameGrid,
+        setGameGrid,
       }}
     >
       {children}

@@ -23,6 +23,7 @@ export const tileSchema = z.object({
     x: z.number().int().min(0).max(21),
     y: z.number().int().min(0).max(11),
     color: colorSchema,
+    isSource: z.boolean().optional(),
 });
 
 export type TileType = z.infer<typeof tileSchema>;
