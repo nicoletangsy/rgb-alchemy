@@ -1,6 +1,6 @@
 import React, { useState, useContext, useCallback, useEffect } from "react";
 import Tile from "../components/tile";
-import SDialog from "../components/SDialog";
+import SDialog from "../components/restartDialog";
 import styled from "styled-components";
 import { Context } from "contexts/context";
 import GameGrid from "./gameGridView";

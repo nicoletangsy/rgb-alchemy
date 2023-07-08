@@ -1,4 +1,4 @@
-import React, { DragEvent } from "react";
+import React, { useState, DragEvent } from "react";
 import { ColorType } from "types";
 import styled from "styled-components";
 import Tooltip from "@mui/material/Tooltip";
@@ -23,7 +23,7 @@ const StyledTile = styled.div<{
 }>`
   width: 24px;
   height: 24px;
-  background-color: ${({$color}) =>
+  background-color: ${({ $color }) =>
     `rgb(${$color.r}, ${$color.g}, ${$color.b})`};
   border-radius: ${({ $isCircle }) => ($isCircle ? `50%` : `2px`)};
   border: 2px solid ${({ $isClosest }) => ($isClosest ? `#ff0000` : `#c0c0c0`)};
@@ -42,11 +42,34 @@ const Tile: React.FC<TileProps> = ({
   onDragOver = () => {},
   onDrop = () => {},
 }) => {
+  const [isDragging, setIsDragging] = useState(false);
+  const [hover, setHover] = useState(false);
   const isCircle = shape === "circle";
   const tooltipText = `${color.r}, ${color.g}, ${color.b}`;
-  
+
+  const onMouseEnter = () => {
+    setHover(true);
+  };
+
+  const onMouseLeave = () => {
+    setHover(false);
+  };
+
+  const handleOnDrag = (e: DragEvent<HTMLDivElement>) => {
+    if (draggable) {
+      setIsDragging(true);
+      if (onDrag) {
+        onDrag(e);
+      }
+    }
+  };
+
+  const handleOnDragEnd = (e: DragEvent<HTMLDivElement>) => {
+      setIsDragging(false);
+  };
+      
   return (
-    <Tooltip title={tooltipText}>
+    <Tooltip title={tooltipText} open={hover && !isDragging}>
       <StyledTile
         $color={color}
         $isCircle={isCircle}
@@ -54,9 +77,12 @@ const Tile: React.FC<TileProps> = ({
         $isClosest={isClosest}
         onClick={onClick}
         draggable={draggable}
-        onDrag={onDrag}
+        onDrag={handleOnDrag}
         onDragOver={onDragOver}
         onDrop={onDrop}
+        onDragEnd={handleOnDragEnd}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       />
     </Tooltip>
   );
