@@ -43,6 +43,7 @@ export const gameDataSchema = z.object({
     closest: tileSchema,
     delta: z.number().min(0).max(100), //percentage, round to 2 dp
     tiles: z.array(tileSchema),
+    isEndGame: z.boolean(),
 });
 
 export type GameDataType = z.infer<typeof gameDataSchema>;

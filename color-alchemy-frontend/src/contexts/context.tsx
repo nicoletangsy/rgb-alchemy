@@ -144,7 +144,7 @@ const ContextProvider: React.FC<{
   }, []);
 
   useEffect(() => {
-    if (lastSrc) {
+    if (!gameData.isEndGame && lastSrc) {
       // update gameData when sources changes
       let newColorSources = colorSources.map((src) => {
         if (src.x === lastSrc.x && src.y === lastSrc.y) {

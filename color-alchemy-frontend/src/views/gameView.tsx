@@ -23,14 +23,20 @@ const SRow = styled.div`
   }
 `;
 
+const SText = styled.span<{ $isDanger: boolean }>`
+  color: ${({ $isDanger }) => ($isDanger ? "red" : "black")};
+`;
+
 const GameView: React.FC = () => {
-  const { userData, gameData, fetchNewGame, loading } = useContext(Context);
+  const { userData, gameData, setGameData, fetchNewGame, loading } =
+    useContext(Context);
   const { closest, delta } = gameData;
   const [open, setOpen] = useState(false);
   const movesLeft = userData.maxMoves - gameData.moved;
   const isWin = delta < 10;
 
   const onCloseDialog = () => {
+    setGameData({ ...gameData, isEndGame: true });
     setOpen(false);
   };
 
@@ -56,7 +62,9 @@ const GameView: React.FC = () => {
         <b>RGB Alchemy</b>
       </SDiv>
       <SDiv>User ID: {userData.userId} </SDiv>
-      <SDiv>Moves left: {movesLeft}</SDiv>
+      <SDiv>
+        Moves left: <SText $isDanger={movesLeft <= 3}>{movesLeft}</SText>
+      </SDiv>
       <SRow>
         <span>Target Color</span>
         <Tile color={userData.target} />
